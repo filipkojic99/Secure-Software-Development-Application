@@ -1,0 +1,8 @@
+1. SQL injection sa XSS skriptom:
+sqli_xss_napad_ispisNaKonzoli'); 
+insert into persons(firstname, lastname, email)
+values('Filip', 'Kojic', '<img src = "x" onerror = "console.log(document.cookie)">')
+--
+
+Zaštita:
+parametrizovani upit, innerText umesto innerHTML, th:text umesto th:utext
