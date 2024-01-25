@@ -1,8 +1,51 @@
 1. SQL injection sa XSS skriptom:
+
 sqli_xss_napad_ispisNaKonzoli'); 
 insert into persons(firstname, lastname, email)
 values('Filip', 'Kojic', '<img src = "x" onerror = "console.log(document.cookie)">')
 --
 
 Zaštita:
-parametrizovani upit, innerText umesto innerHTML, th:text umesto th:utext
+parametrizovani upit - commentRepository.java, innerText umesto innerHTML - persons.html, th:text umesto th:utext - gift.html
+
+2. CSRF napad:
+
+<script>
+            function exploit() {
+                const formData = new FormData();
+                formData.append('id', '1');
+                formData.append('firstName', 'Dobby');
+                formData.append('lastName', 'Free Elf');
+                fetch('http://localhost:8080/update-person',
+                    { method: 'POST', body: formData, credentials: 'include' });
+            }
+</script>
+
+Zaštita:
+
+personsController.java:
+
+@GetMapping("/persons/{id}")
+    public String person(@PathVariable int id, Model model,
+                         HttpSession session) {
+        String csrf = session.getAttribute("CSRF_TOKEN").toString();
+        model.addAttribute("CSRF_TOKEN", csrf);
+        model.addAttribute("person", personRepository.get("" + id));
+        return "person";
+    }
+
+@PostMapping("/update-person")
+    public String updatePerson(Person person,
+                               HttpSession session,
+                               @RequestParam("csrfToken")String csrfToken)
+            throws AccessDeniedException {
+        String csrf = session.getAttribute("CSRF_TOKEN").toString();
+        if (!csrf.equals(csrfToken)) {
+            throw new AccessDeniedException("Forbidden");
+        }
+        personRepository.update(person);
+        return "redirect:/persons/" + person.getId();
+    }
+
+person.html:
+<input type="hidden" name="csrfToken" th:value="${CSRF_TOKEN}">
