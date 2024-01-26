@@ -12,15 +12,16 @@
 <div layout:fragment="content">
     <h1>Users</h1>
 
-    <div class="input-group">
+    <div class="input-group" sec:authorize="hasAuthority('VIEW_PERSONS_LIST')">
         <input type="text" id="searchInput" class="form-control" placeholder="Search...">
         <div class="input-group-append">
             <button id="searchButton" class="btn btn-outline-secondary" type="button">Search</button>
         </div>
     </div>
-    <div class="invisible" id="searchContainer">You searched for <span id="searchTerm"></span></div>
 
-    <table class="table">
+    <div sec:authorize="hasAuthority('VIEW_PERSONS_LIST')" class="invisible" id="searchContainer">You searched for <span id="searchTerm"></span></div>
+
+    <table sec:authorize="hasAuthority('VIEW_PERSONS_LIST')" class="table">
         <thead>
         <tr>
             <th scope="col">#</th>
