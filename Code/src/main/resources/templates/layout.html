@@ -58,8 +58,8 @@
 
         </ul>
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/myprofile}">My Profile</a>
+            <li class="nav-item" sec:authorize="hasAuthority('VIEW_MY_PROFILE')">
+                <a class="nav-link" th:href="@{/myprofile}" >My Profile</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/register-totp}">Register second factor</a>

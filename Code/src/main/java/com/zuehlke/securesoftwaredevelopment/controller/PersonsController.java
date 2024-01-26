@@ -1,6 +1,7 @@
 package com.zuehlke.securesoftwaredevelopment.controller;
 
 import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
+import com.zuehlke.securesoftwaredevelopment.config.SecurityUtil;
 import com.zuehlke.securesoftwaredevelopment.domain.Person;
 import com.zuehlke.securesoftwaredevelopment.domain.User;
 import com.zuehlke.securesoftwaredevelopment.repository.PersonRepository;
@@ -34,42 +35,65 @@ public class PersonsController {
         this.userRepository = userRepository;
     }
 
+    // autorizacija
     @GetMapping("/persons/{id}")
-    public String person(@PathVariable int id, Model model,
-                         HttpSession session) {
-        String csrf = session.getAttribute("CSRF_TOKEN").toString();
-        model.addAttribute("CSRF_TOKEN", csrf);
-        model.addAttribute("person", personRepository.get("" + id));
-        return "person";
+    public String person(@PathVariable int id, Model model, Authentication authentication, HttpSession session) {
+        User currentUser = (User) authentication.getPrincipal();
+        Person person = personRepository.get("" + id);
+
+        if (currentUser.getId() == id || SecurityUtil.hasPermission("VIEW_PERSON")) {
+            model.addAttribute("CSRF_TOKEN", session.getAttribute("CSRF_TOKEN"));
+            model.addAttribute("person", person);
+            return "person";
+        } else {
+            throw new AccessDeniedException("You are not allowed to view this profile!");
+        }
     }
 
+
+    // autorizacija
     @GetMapping("/myprofile")
-    public String self(Model model, Authentication authentication) {
+    @PreAuthorize("hasAuthority('VIEW_MY_PROFILE')")
+    public String self(Model model, Authentication authentication, HttpSession session) {
         User user = (User) authentication.getPrincipal();
+        model.addAttribute("CSRF_TOKEN", session.getAttribute("CSRF_TOKEN"));
         model.addAttribute("person", personRepository.get("" + user.getId()));
         return "person";
     }
 
+    // autorizacija
     @DeleteMapping("/persons/{id}")
-    public ResponseEntity<Void> person(@PathVariable int id) {
-        personRepository.delete(id);
-        userRepository.delete(id);
+    public ResponseEntity<Void> deletePerson(@PathVariable int id, Authentication authentication) {
+        User currentUser = (User) authentication.getPrincipal();
 
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/update-person")
-    public String updatePerson(Person person,
-                               HttpSession session,
-                               @RequestParam("csrfToken")String csrfToken)
-            throws AccessDeniedException {
-        String csrf = session.getAttribute("CSRF_TOKEN").toString();
-        if (!csrf.equals(csrfToken)) {
-            throw new AccessDeniedException("Forbidden");
+        if (currentUser.getId() == id || SecurityUtil.hasPermission("UPDATE_PERSON")) {
+            personRepository.delete(id);
+            userRepository.delete(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            throw new AccessDeniedException("You are not allowed to delete this profile");
         }
-        personRepository.update(person);
-        return "redirect:/persons/" + person.getId();
     }
+
+    // autorizacija
+    @PostMapping("/update-person")
+    public String updatePerson(Person person, Authentication authentication, @RequestParam("csrfToken") String csrfToken, HttpSession session) throws AccessDeniedException {
+        String csrf = session.getAttribute("CSRF_TOKEN").toString();
+        User currentUser = (User) authentication.getPrincipal();
+
+        if (!csrf.equals(csrfToken)) {
+            throw new AccessDeniedException("CSRF token mismatch!");
+        }
+
+        if (currentUser.getId() == Integer.parseInt(person.getId())
+                || SecurityUtil.hasPermission("UPDATE_PERSON")) {
+            personRepository.update(person);
+            return "redirect:/persons/" + person.getId();
+        } else {
+            throw new AccessDeniedException("You are not allowed to update this profile!");
+        }
+    }
+
 
     // autorizacija
     @GetMapping("/persons")

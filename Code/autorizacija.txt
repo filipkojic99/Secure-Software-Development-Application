@@ -83,17 +83,19 @@ ne vidi users u meniju ako nema dozvolu
 
 5. VIEW_PERSON: - POPRAVITI
 
-BACKEND - nema jer za get zahtev vraca http 403, pa ne ucitava stranicu
-
-FRONTEND - u persons.html:
-ne vidi link za detalje osobe
-
-FRONTEND - u person.html: -obrisano
-ne vidi glavni div ako nema dozvolu
-
 6. UPDATE_PERSON:
 
 7. VIEW_MY_PROFILE:
+
+BACKEND - u personsController:
+
+// autorizacija
+ @GetMapping("/myprofile")
+ @PreAuthorize("hasAuthority('VIEW_MY_PROFILE')")
+ public String self(Model model, Authentication authentication) {
+ 
+FRONTEND - u layouts.html:
+ne vidi My Profile u meniju ako nema dozvolu
 
 
 8. RATE_GIFT:
