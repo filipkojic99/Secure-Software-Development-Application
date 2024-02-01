@@ -46,6 +46,8 @@ public class PersonsController {
             model.addAttribute("person", person);
             return "person";
         } else {
+            LOG.warn(String.format("Korisnik sa ID %s je pokusao da pogleda profil osobe sa ID %s" +
+                    "bez odgovarajuce dozvole!", currentUser.getId(), id));
             throw new AccessDeniedException("You are not allowed to view this profile!");
         }
     }
@@ -71,6 +73,8 @@ public class PersonsController {
             userRepository.delete(id);
             return ResponseEntity.noContent().build();
         } else {
+            LOG.warn(String.format("Korisnik sa ID %s je pokusao da obrise profil osobe sa ID %s " +
+                    "bez odgovarajuce dozvole!", currentUser.getId(), id));
             throw new AccessDeniedException("You are not allowed to delete this profile");
         }
     }
@@ -82,6 +86,7 @@ public class PersonsController {
         User currentUser = (User) authentication.getPrincipal();
 
         if (!csrf.equals(csrfToken)) {
+            LOG.warn(String.format("CSRF tokeni se ne poklapaju. Ulogovan korisnik sa ID: %s", currentUser.getId()));
             throw new AccessDeniedException("CSRF token mismatch!");
         }
 
@@ -90,6 +95,8 @@ public class PersonsController {
             personRepository.update(person);
             return "redirect:/persons/" + person.getId();
         } else {
+            LOG.warn(String.format("Korisnik sa ID %s je pokusao da azurira profil osobe sa ID %s " +
+                    "bez odgovarajuce dozvole!", currentUser.getId(), person.getId()));
             throw new AccessDeniedException("You are not allowed to update this profile!");
         }
     }
@@ -100,6 +107,7 @@ public class PersonsController {
     @PreAuthorize("hasAuthority('VIEW_PERSONS_LIST')")
     public String persons(Model model) {
         model.addAttribute("persons", personRepository.getAll());
+        model.addAttribute("canViewPerson", SecurityUtil.hasPermission("VIEW_PERSON"));
         return "persons";
     }
 

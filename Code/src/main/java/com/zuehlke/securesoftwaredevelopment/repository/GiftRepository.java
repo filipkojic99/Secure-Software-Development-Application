@@ -37,7 +37,7 @@ public class GiftRepository {
                 giftList.add(gift);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom dohvatanja poklona!", e);
         }
         return giftList;
     }
@@ -55,6 +55,8 @@ public class GiftRepository {
             while (rs.next()) {
                 giftList.add(createGiftFromResultSet(rs));
             }
+        } catch (SQLException e) {
+            LOG.error("Greska prilikom pretrage poklona!", e);
         }
         return giftList;
     }
@@ -83,7 +85,7 @@ public class GiftRepository {
                 return gift;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom dohvatanja poklona po ID!", e);
         }
 
         return null;
@@ -103,6 +105,7 @@ public class GiftRepository {
             if (generatedKeys.next()) {
                 id = generatedKeys.getLong(1);
                 long finalId = id;
+                auditLogger.audit(String.format("Kreiran poklon sa ID %s i imenom %s!", finalId, gift.getName()));
                 tagsToInsert.stream().forEach(tag -> {
                     String query2 = "INSERT INTO gift_to_tag(giftId, tagId) VALUES (?, ?)";
                     try (PreparedStatement statement2 = connection.prepareStatement(query2);
@@ -111,12 +114,12 @@ public class GiftRepository {
                         statement2.setInt(2, tag.getId());
                         statement2.executeUpdate();
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        LOG.error("Greska prilikom dodavanja tagova poklonu!", e);
                     }
                 });
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom kreiranja poklona!", e);
         }
         return id;
     }
@@ -133,8 +136,9 @@ public class GiftRepository {
             statement.executeUpdate(query2);
             statement.executeUpdate(query3);
             statement.executeUpdate(query4);
+            auditLogger.audit(String.format("Obrisan poklon sa ID %s!", giftId));
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom brisanja poklona!", e);
         }
     }
 

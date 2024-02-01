@@ -32,7 +32,7 @@ public class TagRepository {
                 tagList.add(new Tag(rs.getInt(1), rs.getString(2)));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom dohvatanja tagova!", e);
         }
         return tagList;
     }

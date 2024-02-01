@@ -10,10 +10,17 @@ import java.security.SecureRandom;
 
 @WebListener
 public class CsrfHttpSessionListener implements HttpSessionListener {
+
+    public static final AuditLogger auditLogger = AuditLogger.getAuditLogger(CsrfHttpSessionListener.class);
     @Override
     public void sessionCreated(HttpSessionEvent se) {
         String token = createToken();
         se.getSession().setAttribute("CSRF_TOKEN", token);
+    }
+
+    @Override
+    public void sessionDestroyed(HttpSessionEvent se) {
+        auditLogger.audit("Sesija unistena!");
     }
 
     private static String createToken() {

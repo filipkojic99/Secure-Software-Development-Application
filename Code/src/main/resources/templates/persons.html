@@ -21,6 +21,8 @@
 
     <div sec:authorize="hasAuthority('VIEW_PERSONS_LIST')" class="invisible" id="searchContainer">You searched for <span id="searchTerm"></span></div>
 
+    <input type="hidden" id="canViewPerson" th:value="${canViewPerson}" />
+
     <table sec:authorize="hasAuthority('VIEW_PERSONS_LIST')" class="table">
         <thead>
         <tr>
@@ -49,6 +51,8 @@
             let search = function () {
                 const searchTerm = document.getElementById("searchInput").value;
 
+                const canViewPerson = document.getElementById("canViewPerson").value === 'true';
+
                 fetch('/persons/search?searchTerm=' + searchTerm)
                     .then(function (result) {return result.json()})
                     .then(function(persons) {
@@ -70,7 +74,11 @@
                             tdElement.innerText = person.email;
                             tableRowElement.appendChild(tdElement);
                             tdElement = document.createElement("td");
-                            tdElement.innerHTML = '<a href="/persons/' + person.id + '">View profile</a>';
+
+                            if (canViewPerson) {
+                                tdElement.innerHTML = '<a href="/persons/' + person.id + '">View profile</a>';
+                            }
+                            
                             tableRowElement.appendChild(tdElement);
 
                             tableContent.appendChild(tableRowElement);

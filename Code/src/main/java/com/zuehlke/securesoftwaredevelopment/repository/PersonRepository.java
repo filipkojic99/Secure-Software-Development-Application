@@ -34,7 +34,7 @@ public class PersonRepository {
                 personList.add(createPersonFromResultSet(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom dohvatanja osoba!", e);
         }
         return personList;
     }
@@ -49,6 +49,8 @@ public class PersonRepository {
             while (rs.next()) {
                 personList.add(createPersonFromResultSet(rs));
             }
+        } catch (SQLException e) {
+            LOG.error("Greska prilikom pretrage osoba!", e);
         }
         return personList;
     }
@@ -62,7 +64,7 @@ public class PersonRepository {
                 return createPersonFromResultSet(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom dohvatanja osobe po ID!", e);
         }
 
         return null;
@@ -74,8 +76,9 @@ public class PersonRepository {
              Statement statement = connection.createStatement();
         ) {
             statement.executeUpdate(query);
+            auditLogger.audit(String.format("Obrisana osoba sa ID %s!", personId));
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom brisanja osobe!", e);
         }
     }
 
@@ -99,8 +102,13 @@ public class PersonRepository {
             statement.setString(1, firstName);
             statement.setString(2, email);
             statement.executeUpdate();
+            auditLogger.audit(String.format("Azuriranje osobe:" +
+                            " STARE VREDNOSTI: ime:%s prezime:%s mejl:%s " +
+                            " NOVE VREDNOSTI: ime:%s prezime:%s mejl:%s",
+                    personFromDb.getFirstName(), personFromDb.getLastName(), personFromDb.getEmail(),
+                    personUpdate.getFirstName(), personUpdate.getLastName(), personUpdate.getEmail()));
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greska prilikom azuriranja osobe!", e);
         }
     }
 }
