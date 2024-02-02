@@ -1,6 +1,6 @@
 insert into users(id, username, password)
 values (1, 'bruce', 'wayne'), -- buyer
-       (2, 'peter', 'security_rules'), -- x
+       (2, 'peter', 'security_rules'), -- manager
        (3, 'tom', 'guessmeifyoucan'), -- manager
         (4, 'santa', 'clause'); -- admin
 
@@ -52,6 +52,7 @@ values (1, 'ADMIN'),
 insert into user_to_roles(userId, roleId)
 values (4, 1), -- santa je admin
        (3, 2), -- tom je manager
+       (2, 2), -- peter je manager
        (1, 3); -- bruce je buyer
 
 insert into permissions(id, name)

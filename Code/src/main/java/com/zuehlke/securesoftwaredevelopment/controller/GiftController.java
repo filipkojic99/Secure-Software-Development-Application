@@ -146,7 +146,7 @@ public class GiftController {
             return String.format("redirect:/buy-gift/%s", id);
         }
 
-        auditLogger.audit(String.format("Kupljen poklon sa ID %s.", id));
+        auditLogger.audit(String.format("Kupljen poklon sa ID %s!", id));
         return String.format("redirect:/buy-gift/%s?bought=true", id);
     }
 }

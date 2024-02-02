@@ -47,7 +47,7 @@ public class PersonsController {
             return "person";
         } else {
             LOG.warn(String.format("Korisnik sa ID %s je pokusao da pogleda profil osobe sa ID %s" +
-                    "bez odgovarajuce dozvole!", currentUser.getId(), id));
+                    " bez odgovarajuce dozvole!", currentUser.getId(), id));
             throw new AccessDeniedException("You are not allowed to view this profile!");
         }
     }

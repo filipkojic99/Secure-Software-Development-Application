@@ -42,7 +42,7 @@ public class RatingRepository {
                 preparedStatement.setInt(2, rating.getGiftId());
                 preparedStatement.setInt(3, rating.getUserId());
                 preparedStatement.executeUpdate();
-                auditLogger.audit(String.format("Rejting za poklon sa ID %d azuriran sa %d na %d",
+                auditLogger.audit(String.format("Rejting za poklon sa ID %d azuriran sa %d na %d!",
                         rating.getGiftId(), existingRating, rating.getRating()));
             } else {
                 PreparedStatement preparedStatement = connection.prepareStatement(query3);
@@ -50,7 +50,7 @@ public class RatingRepository {
                 preparedStatement.setInt(2, rating.getUserId());
                 preparedStatement.setInt(3, rating.getRating());
                 preparedStatement.executeUpdate();
-                auditLogger.audit(String.format("Novi rejting kreiran: poklon ID %d, rejting %d",
+                auditLogger.audit(String.format("Novi rejting kreiran: poklon ID %d, rejting %d!",
                         rating.getGiftId(), rating.getRating()));
             }
         } catch (SQLException e) {
