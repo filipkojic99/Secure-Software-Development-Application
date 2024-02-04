@@ -1,0 +1,6 @@
+projectKey=com.zuehlke:secure-software-development
+serverUrl=http://localhost:9000
+serverVersion=8.9.10.61524
+dashboardUrl=http://localhost:9000/dashboard?id=com.zuehlke%3Asecure-software-development
+ceTaskId=AY03xOJ0agK0WvZ5GfeI
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AY03xOJ0agK0WvZ5GfeI
